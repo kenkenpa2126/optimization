@@ -16,10 +16,10 @@ from flask_cors import CORS
 game_id = {'0': '馬娘', '1': 'バンドリ', '2': '原神', '3': 'プロジェクトセカイ', '4': 'パズドラ'}
 
 # APIキーの設置
-CONSUMER_KEY = 'E234DOmmhHQgcEw9EmWdkrYMm'
-CONSUMER_SECRET = 'qJ4mdJ1WT6tmVMNVCNZdYo3aSwCiDFgpK82h5UjB7E6YrwZKUQ'
-ACCESS_TOKEN = '838961139979464705-VnVLRvhYpRgoAKEzmLeAtn1zGr3NJvm'
-ACCESS_SECRET = 'YMP6830CHCAwrO8oYoDoOsJvzT7GX0pgNre1gIqONRTXP'
+CONSUMER_KEY = 'xxxx'
+CONSUMER_SECRET = 'xxxx'
+ACCESS_TOKEN = '8xxx'
+ACCESS_SECRET = 'xxxx'
 
 twitter = OAuth1Session(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET)
 url = "https://api.twitter.com/1.1/search/tweets.json"
