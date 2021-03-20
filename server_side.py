@@ -6,8 +6,6 @@ from dateutil.relativedelta import relativedelta
 import pyqubo as pyq
 import openjij as oj
 import numpy as np
-import dimod
-import math
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -151,6 +149,8 @@ def do_Post():
     print(c)
 
     result = optimize(game_type, W, c, w, min_count)
+    if result == 'paramater error':
+        return result
     resultstr = {k: str(v) for k, v in result.items()}
 
     return jsonify(resultstr)

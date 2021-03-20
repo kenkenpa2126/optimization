@@ -1,0 +1,7 @@
+requests_oauthlib
+python-dateutil
+pyqubo
+openjij
+numpy
+flask
+flask_cors
