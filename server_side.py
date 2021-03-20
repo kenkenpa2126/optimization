@@ -64,16 +64,19 @@ CORS(app)
 
 @app.route('/', methods = ['GET','POST'])
 def do_Post():
-    
-    # if mode == 0:
-    #     c = request['c']
-    # else if mode == 1:
-    
-    # else if mode == 2:
 
     gacha_bid = {'0':347, '1':340, '2':320, '3':315, '4':717}
+    
+    mode = request['mode']
+    if mode == 0:
+        input_c = request['c']
+    else if mode == 1:
+        break:
+        # input_c = {int(id): ガチャの期待値}　(0<= id <= 4)
+    else if mode == 2:
+        break:
+        # input_c = {int(id): twitterでの話題性} (0<= id <= 4)
 
-    input_c = request['c']
     game_type = request['game']
     W = request['W']
 
