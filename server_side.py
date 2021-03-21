@@ -10,6 +10,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 game_id = {'0': 'ウマ娘', '1': 'パズドラ', '2': '原神', '3': 'プロセカ', '4': 'NieR', '5':'にゃんこ大戦争', '6':'シャドバ'}
+gacha_bid = {'0': 347, '1': 717, '2': 320, '3': 315, '4': 283, '5':545, '6': 240}
 
 # APIキーの設置
 CONSUMER_KEY = 'xxxxx'
@@ -53,8 +54,20 @@ def optimize(game_type, W, c, w, min_count):
     N = len(w)
     # x_max = {k: int(W / v) for k, v in w.items()}
 
-    offset_value = {x: min_count[x] * y for x, y in w.items()}
-    x_max = {k: int((W - sum(offset_value)) / v) for k, v in w.items()}
+    offset_value = {x: int(min_count[x]) * int(y) for x, y in w.items()}
+    new_W = W - sum(offset_value.values())
+    x_max = {k: int((new_W) / v) for k, v in w.items()}
+
+    print('min_count')
+    print(min_count)
+    print('offset_value')
+    print(offset_value)
+    print('sum_offset_value')
+    print(sum(offset_value.values()))
+    print('new_W')
+    print(new_W)
+    print('x_max')
+    print(x_max)
 
     for k, v in x_max.items():
         if v <= 0:
@@ -64,16 +77,20 @@ def optimize(game_type, W, c, w, min_count):
     # print(x_max)
 
     x = pyq.Array([pyq.LogEncInteger('x_{}'.format(i), (0, x_max[i])) for i in x_max.keys()])
-    y = pyq.LogEncInteger('y', (0, W))
+    y = pyq.LogEncInteger('y', (0, new_W))
     A, B = pyq.Placeholder("A"), pyq.Placeholder("B")
-    HA = pyq.Constraint(A * (W - sum(w[a] * x[a] for a in range(N)) - y) ** 2, label='HA')
+    HA = pyq.Constraint(A * (new_W - sum(w[a] * x[a] for a in range(N)) - y) ** 2, label='HA')
     HB = -B * sum(c[a] * x[a] for a in range(N))
     Q = HA + HB
     model = Q.compile()
 
     feed_dict = {'A': 1, 'B': 1}
     qubo, offset = model.to_qubo(feed_dict=feed_dict)
-    sampler = oj.SASampler()
+
+    #iteration回数
+    iteration = 1000
+
+    sampler = oj.SASampler(num_reads=iteration)
     response = sampler.sample_qubo(qubo)
 
     def decode_solution(sampleset):
@@ -93,18 +110,30 @@ def optimize(game_type, W, c, w, min_count):
 
     print(result['x'])
     result_x = result['x']
+    print('result_x')
+    print(result_x)
 
     # gacha_count = {v: result_x[k] for k,v in game_type.items()}
     # print(gacha_count)
-    gacha_count = {game_id[str(v)]: result_x[k] + min_count[k] for k, v in enumerate(game_type)}
+    gacha_result = {game_id[str(v)]: result_x[k] + min_count[k] for k, v in enumerate(game_type)}
+    gacha_count = {str(v): result_x[k] + min_count[k] for k, v in enumerate(game_type)}
+    print('gacha_result')
+    print(gacha_result)
+    print('gacha_count')
     print(gacha_count)
 
-    for k, v in gacha_count.items():
+    for k, v in gacha_result.items():
         print(k)
         print(v)
-        print('回引く')
 
-    return gacha_count
+    sum_money = sum(offset_value)
+    for k, v in gacha_count.items():
+        sum_money += v*int(gacha_bid[k])
+
+    print('合計金額：')
+    print(sum_money)
+
+    return gacha_result
 
 
 app = Flask(__name__)
@@ -112,7 +141,6 @@ CORS(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def do_Post():
-    gacha_bid = {'0': 347, '1': 717, '2': 320, '3': 315, '4': 283, '5':545, '6': 240}
 
     mode = request.json['mode']
     if mode == 0:
