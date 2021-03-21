@@ -9,7 +9,7 @@ import numpy as np
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-game_id = {'0': '馬娘', '1': 'バンドリ', '2': '原神', '3': 'プロジェクトセカイ', '4': 'パズドラ'}
+game_id = {'0': 'ウマ娘', '1': 'パズドラ', '2': '原神', '3': 'プロセカ', '4': 'NieR', '5':'にゃんこ大戦争', '6':'シャドバ'}
 
 # APIキーの設置
 CONSUMER_KEY = 'xxxxx'
@@ -21,7 +21,7 @@ twitter = OAuth1Session(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECR
 url = "https://api.twitter.com/1.1/search/tweets.json"
 
 # 各ガチャの最高レアの期待値（100円あたり）
-gacha_percent_dic = {'0': 0.865, '1': 0.882, '2': 0.186, '3': 0.952, '4': 0.976}
+gacha_percent_dic = {'0': 0.865, '1': 0.976, '2': 0.186, '3': 0.952, '4': 0.800 , '5':0.917 , '6':0.652}
 
 def kitaichi(game_name):
     tweets = []
@@ -112,10 +112,12 @@ CORS(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def do_Post():
-    gacha_bid = {'0': 347, '1': 340, '2': 320, '3': 315, '4': 717}
+    gacha_bid = {'0': 347, '1': 717, '2': 320, '3': 315, '4': 283, '5':545, '6': 240}
 
     mode = request.json['mode']
     if mode == 0:
+        if request.json['c'] == None:
+            return "parameter error"
         input_c = request.json['c']
     elif mode == 1:
         input_c = gacha_percent_dic
